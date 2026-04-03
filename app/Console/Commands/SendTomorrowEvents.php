@@ -28,7 +28,9 @@ if ($events->isEmpty()) {
         $lineUserIds = array_filter([
             env('LINE_USER_ID_ME'),
             env('LINE_USER_ID_PAPA'),
-        ]);
+            env('LINE_USER_ID_AIMI'), // ←追加
+            env('LINE_USER_ID_HINA'),
+           ]);
 
         foreach ($events as $event) {
             foreach ($lineUserIds as $lineUserId) {
@@ -44,13 +46,13 @@ if ($events->isEmpty()) {
                             'template' => [
                                 'type' => 'confirm',
                                 'text' => "【明日の行事】\n{$event->title}\n日付：{$event->event_date}" . ($event->event_time ? "\n時間：{$event->event_time}" : ''),
-                                'actions' => [
-                                    [
-                                        'type' => 'postback',
-                                        'label' => '確認しました',
-                                        'data' => 'action=confirm_event&event_id=' . $event->id,
-                                        'displayText' => '確認しました',
-                                    ],
+'actions' => [
+    [
+        'type' => 'postback',
+        'label' => '確認しました',
+        'data' => 'action=confirm_event&event_id=' . $event->id . '&user_id=' . $lineUserId,
+        'displayText' => '確認しました',
+    ],
                                     [
                                         'type' => 'postback',
                                         'label' => 'あとで見る',

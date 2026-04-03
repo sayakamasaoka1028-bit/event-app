@@ -29,7 +29,7 @@ class LineWebhookController extends Controller
 
             $event = Event::find($data['event_id']);
 
-            if (!$event) {
+            if (! $event) {
                 continue;
             }
 
@@ -38,6 +38,8 @@ class LineWebhookController extends Controller
             $nameMap = [
                 env('LINE_USER_ID_ME') => 'さやか',
                 env('LINE_USER_ID_PAPA') => 'パパ',
+                env('LINE_USER_ID_AIMI') => 'あいみ',
+                env('LINE_USER_ID_HINA') => 'ひな',
             ];
 
             $actorName = $nameMap[$userId] ?? '家族';
@@ -50,7 +52,9 @@ class LineWebhookController extends Controller
             $lineUserIds = array_filter([
                 env('LINE_USER_ID_ME'),
                 env('LINE_USER_ID_PAPA'),
-            ]);
+                env('LINE_USER_ID_AIMI'),
+                env('LINE_USER_ID_HINA'),         
+              ]);
 
             Log::info('送信先LINE userIds', $lineUserIds);
 
@@ -71,7 +75,7 @@ class LineWebhookController extends Controller
                 ]);
             }
 
-            if (!empty($webhookEvent['replyToken'])) {
+            if (! empty($webhookEvent['replyToken'])) {
                 Http::withHeaders([
                     'Authorization' => 'Bearer ' . config('services.line.channel_access_token'),
                     'Content-Type' => 'application/json',
@@ -80,7 +84,7 @@ class LineWebhookController extends Controller
                     'messages' => [
                         [
                             'type' => 'text',
-                            'text' => '確認しましたを受け付けました。',
+                            'text' => "{$actorName}が確認しました。",
                         ],
                     ],
                 ]);
