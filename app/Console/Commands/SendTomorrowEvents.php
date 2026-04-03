@@ -8,23 +8,23 @@ use Illuminate\Support\Facades\Http;
 
 class SendTomorrowEvents extends Command
 {
-    protected $signature = 'app:send-tomorrow-events';
+    protected $signature = 'app:send-tomorrow-events {date?}';
     protected $description = '明日の行事をLINEに送信する';
 
     public function handle()
     {
-        $tomorrow = now()->addDay()->toDateString();
 
-        $events = Event::whereDate('event_date', $tomorrow)
-            ->where('is_notified', false)
-            ->orderBy('event_time', 'asc')
-            ->get();
+$date = $this->argument('date') ?? now()->addDay()->toDateString();
 
-        if ($events->isEmpty()) {
-            $this->info('明日の行事はありません');
-            return Command::SUCCESS;
-        }
+$events = Event::whereDate('event_date', $date)
+    ->where('is_notified', false)
+    ->orderBy('event_time', 'asc')
+    ->get();
 
+if ($events->isEmpty()) {
+    $this->info("{$date} の行事はありません");
+    return Command::SUCCESS;
+}
         $lineUserIds = array_filter([
             env('LINE_USER_ID_ME'),
             env('LINE_USER_ID_PAPA'),
@@ -69,8 +69,7 @@ class SendTomorrowEvents extends Command
             ]);
         }
 
-        $this->info('明日の行事通知を送信しました');
-
+$this->info("{$date} の行事通知を送信しました");
         return Command::SUCCESS;
     }
 }
